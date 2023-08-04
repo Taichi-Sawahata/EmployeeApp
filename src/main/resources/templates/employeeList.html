@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<title>社員一覧</title>
+	<meta charset="utf-8" />
+	<link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+
+<body>
+	<h1 class="center">社員一覧</h1>
+	<table class="border table">
+		<thead>
+			<tr>
+				<th class="border parent">NO</th>
+				<th class="border parent">氏名</th>
+				<th class="border parent">出身地</th>
+				<th class="border parent">入社月</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr th:each="employee, status : ${employeeList}" th:if="${status.index % 4 == 0}">
+				<td th:text="${employee}" class="border center"></td>
+				<td th:text="${employeeList[status.index + 1]}" class="border center"></td>
+				<td th:text="${employeeList[status.index + 2]}" class="border center"></td>
+				<td th:text="${employeeList[status.index + 3]}" class="border"></td>
+				<td class="border"><a th:href="@{'/employeeDetail/' + ${employee}}">詳細</a></td>
+			</tr>
+		</tbody>
+	</table>
+	<button  class="button"><a th:href="@{/employeeRegister}">新規登録へ</a></button>
+</body>
+</html>

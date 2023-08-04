@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>従業員詳細</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        /* 追加したスタイル */
+        form {
+			display: inline-block;
+			}
+		form:last-child {
+			margin-bottom:30px;
+		}
+		
+
+    </style>
+</head>
+
+<body>
+    <h1 class="center">従業員詳細</h1>
+    <h2 class="center" th:text="${employeeDetail.name}"></h2>
+    <div class="m0">
+        <form action="/addAttendance" method="post">
+            <input type="hidden" name="id" th:value="${employeeDetail.id}">
+            <button type="submit" name="submit" value="success">出勤</button>
+        </form>
+
+        <!-- 休憩開始ボタン -->
+        <form action="/addBreakStart" method="post">
+            <input type="hidden" name="id" th:value="${employeeDetail.id}">
+            <button type="submit" name="submit" value="success">休憩開始</button>
+        </form>
+
+        <!-- 休憩終了ボタン -->
+<!--        <form action="/addBreakEnd" method="post">-->
+<!--            <input type="hidden" name="id" th:value="${employeeDetail.id}">-->
+<!--            <button type="submit" name="submit" value="success">休憩終了</button>-->
+<!--        </form>-->
+
+        <!-- 退勤ボタン -->
+<!--        <form action="/addClockOut" method="post">-->
+<!--            <input type="hidden" name="id" th:value="${employeeDetail.id}">-->
+<!--            <button type="submit" name="submit" value="success">退勤</button>-->
+<!--        </form>-->
+    </div>
+    <table class="border table">
+        <thead>
+            <tr>
+                <th class="border">出勤日時</th>
+                <th class="border">休憩開始日時</th>
+                <th class="border">休憩終了日時</th>
+                <th class="border">退勤日時</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td class="border inherit" th:text="${employeeDetail.attendance?.clockIn}"></td>
+                <td class="border inherit" th:text="${employeeDetail.attendance?.breakStart}"></td>
+                <td class="border inherit" th:text="${employeeDetail.attendance?.breakEnd}"></td>
+                <td class="border inherit" th:text="${employeeDetail.attendance?.clockOut}"></td>
+            </tr>
+        </tbody>
+    </table>
+    <button class="button"><a th:href="@{/employeeList}">社員一覧へ</a></button>
+</body>
+
+</html>

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<title>社員新規登録</title>
+	<meta charset="utf-8" />
+	<link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+
+<body>
+	<h1>社員新規登録</h1>
+	<div>
+		<form method="post" action="/employeeRegister">
+		<div>氏名 <input type="text" name="name" placeholder="山田 太郎" required></div>
+		<div>出身地 <input type="text" name="hometown" placeholder="都道府県を選択またはテキスト" required></div>
+		<div>入社月<input type="date" name="joining_month" required></div>
+		<button type="submit">登録する</button>
+		<button><a th:href="@{/employeeList}">社員一覧へ</a></button>
+		</form>
+	</div>
+</body>
+</html>
