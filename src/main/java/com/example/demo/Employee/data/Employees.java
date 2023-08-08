@@ -24,6 +24,6 @@ public class Employees {
 
 	@JsonProperty("updated_at")
 	private String updated_at;
-	
-	 private Attendance attendance;
+
+	private Attendance attendance;
 }

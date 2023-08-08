@@ -1,4 +1,5 @@
 package com.example.demo.Employee.controller;
+
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -40,7 +41,9 @@ public class EmployeeController {
 	@GetMapping("/employeeDetail/{id}")
 	public String getEmployeeDetail(@PathVariable("id") int id, Model model) throws IOException {
 		Employees employeeDetail = employeeService.getEmployeeDetail(id);
+		//		Attandance attandanceList = employeeDetail.getAttendance();
 		model.addAttribute("employeeDetail", employeeDetail);
+		//		model.addAllAttributes("attendance", attendance);
 		return "employeeDetail";
 	}
 
@@ -48,43 +51,67 @@ public class EmployeeController {
 	public String employeeRegisterPage() {
 		return "employeeRegister";
 	}
-	
+
 	@PostMapping("/employeeRegister")
 	public String registerEmployee(@RequestParam("name") String name,
-	                               @RequestParam("hometown") String hometown,
-	                               @RequestParam("joining_month") String joiningMonth) throws IOException {
-	    // 入力データをAPIの要件に合わせて整形する
-	    String requestBody = "{\"body\": \"{\\\"name\\\":\\\"" + name + "\\\",\\\"hometown\\\":\\\"" + hometown + "\\\",\\\"joining_month\\\":\\\"" + joiningMonth + "\\\"}\"}";
+			@RequestParam("hometown") String hometown,
+			@RequestParam("joining_month") String joiningMonth) throws IOException {
+		// 入力データをAPIの要件に合わせて整形する
+		String requestBody = "{\"body\": \"{\\\"name\\\":\\\"" + name + "\\\",\\\"hometown\\\":\\\"" + hometown
+				+ "\\\",\\\"joining_month\\\":\\\"" + joiningMonth + "\\\"}\"}";
 
-	    // APIにデータを送信
-	    String apiUrl = "https://jsn9xu2vsk.execute-api.ap-northeast-1.amazonaws.com/sample/attendanceandabsence/employee";
-	    RestTemplate restTemplate = new RestTemplate();
-	    HttpHeaders headers = new HttpHeaders();
-	    headers.setContentType(MediaType.APPLICATION_JSON);
-	    HttpEntity<String> requestEntity = new HttpEntity<>(requestBody, headers);
-	    ResponseEntity<String> responseEntity = restTemplate.postForEntity(apiUrl, requestEntity, String.class);
-	    String responseBody = responseEntity.getBody();
+		// APIにデータを送信
+		String apiUrl = "https://jsn9xu2vsk.execute-api.ap-northeast-1.amazonaws.com/sample/attendanceandabsence/employee";
+		RestTemplate restTemplate = new RestTemplate();
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		HttpEntity<String> requestEntity = new HttpEntity<>(requestBody, headers);
+		ResponseEntity<String> responseEntity = restTemplate.postForEntity(apiUrl, requestEntity, String.class);
+		String responseBody = responseEntity.getBody();
 
-	    // APIからのレスポンスを処理
-	    // ここで必要な処理を行う（成功か失敗かを判定するなど）
+		// APIからのレスポンスを処理
+		// ここで必要な処理を行う（成功か失敗かを判定するなど）
 
-	    // 新規登録後に社員一覧ページにリダイレクト
-	    return "redirect:/employeeList";
+		// 新規登録後に社員一覧ページにリダイレクト
+		return "redirect:/employeeList";
 	}
 
-
 	@PostMapping("/addAttendance")
-	public String addAttendance(@RequestParam("id") int employeeId, RedirectAttributes redirectAttributes)
+	public String addAttendance(@RequestParam("id") int employeeId, @RequestParam("submit") String submit,
+			RedirectAttributes redirectAttributes)
 			throws IOException {
 		LocalDateTime now = LocalDateTime.now();
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 		String attendanceTime = now.format(formatter);
 
-		Attendance attendance = new Attendance();
-		attendance.setEmployeeId(employeeId);
-		attendance.setClockIn(attendanceTime);
+		// データベースから社員の最新の出退勤情報を取得
+		Employees employeeDetail = employeeService.getEmployeeDetail(employeeId);
+		System.out.println(employeeDetail);
+		Attendance latestAttendance = employeeDetail.getAttendance();
+		System.out.println(latestAttendance);
 
-		boolean success = employeeService.addAttendance(attendance);
+		Attendance newAttendance = new Attendance();
+		newAttendance.setEmployeeId(employeeId);
+
+		if ("in".equals(submit)) {
+			newAttendance.setClockIn(attendanceTime);
+			System.out.println(newAttendance);
+		}
+
+		if ("break_start".equals(submit)) {
+			newAttendance.setBreakStart(attendanceTime);
+		}
+
+		if ("break_end".equals(submit)) {
+			newAttendance.setBreakEnd(attendanceTime);
+		}
+
+		if ("out".equals(submit)) {
+			newAttendance.setClockOut(attendanceTime);
+		}
+
+		boolean success = employeeService.addAttendance(newAttendance);
+		System.out.println(success);
 
 		if (success) {
 			redirectAttributes.addAttribute("id", employeeId);
@@ -95,22 +122,5 @@ public class EmployeeController {
 			return "error-page";
 		}
 	}
-
-
-
-	@PostMapping("/addBreakStart")
-    public String addBreakStart(@RequestParam("id") int employeeId, RedirectAttributes redirectAttributes)
-            throws IOException {
-        boolean success = employeeService.addBreakStart(employeeId);
-
-        if (success) {
-            redirectAttributes.addAttribute("id", employeeId);
-            return "redirect:/employeeDetail/{id}";
-        } else {
-            // 処理失敗時のリダイレクト先などを記述する
-            return "error-page";
-        }
-    }
-
 
 }
